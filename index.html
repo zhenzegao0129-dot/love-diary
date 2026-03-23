@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>我们的专属小站</title>
+    <style>
+        body {
+            background-color: #fdf2f8; 
+            font-family: "Microsoft YaHei", sans-serif; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;             
+            padding: 80px 20px 100px 20px; 
+            box-sizing: border-box;
+        }
+
+        /* ======== 顶部小面板 ======== */
+        .timer-panel {
+            background-image: url('hezhao.jpg');
+            background-size: cover;          
+            background-position: center;     
+            width: 320px;
+            height: 420px; 
+            border-radius: 20px;       
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15); 
+            position: relative;
+            overflow: hidden;          
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 5;
+        }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.45); z-index: 1; }
+        .content { position: relative; z-index: 2; color: white; width: 100%; }
+        .content h2 { font-size: 22px; margin-bottom: 40px; font-weight: 400; letter-spacing: 3px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .timer-container { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; }
+        .time-box { background-color: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); border-radius: 12px; padding: 12px 6px; min-width: 55px; border: 1px solid rgba(255, 255, 255, 0.25); }
+        .number { display: block; font-size: 26px; font-weight: bold; font-family: "Arial", sans-serif; }
+        .label { display: block; font-size: 12px; margin-top: 5px; opacity: 0.9; }
+        .date-text { font-size: 13px; opacity: 0.8; margin-top: 15px; letter-spacing: 1px; }
+
+        /* ======== 垂直时间轴相册墙 ======== */
+        .timeline-section { width: 100%; max-width: 800px; margin-top: 60px; }
+        .timeline-section h3 { font-size: 22px; color: #d88391; margin-bottom: 60px; font-weight: normal; letter-spacing: 4px; text-align: center; }
+        
+        .timeline-container { position: relative; margin: 0 auto; padding: 20px 0; }
+        .timeline-container::after {
+            content: ''; position: absolute; width: 4px; background-color: #ffccd5;
+            top: 0; bottom: 0; left: 50%; margin-left: -2px; border-radius: 2px;
+        }
+
+        .timeline-item {
+            padding: 10px 40px; position: relative; width: 50%; box-sizing: border-box; text-align: right;
+            animation: fadeIn 0.5s ease;
+        }
+        .timeline-item.right { left: 50%; text-align: left; }
+        .timeline-item.left { left: 0; }
+
+        .timeline-dot {
+            position: absolute; width: 18px; height: 18px; right: -13px;
+            background-color: #ff6b81; border: 4px solid #fff; top: 25px;
+            border-radius: 50%; z-index: 1; box-shadow: 0 0 10px rgba(255,107,129,0.3);
+        }
+        .timeline-item.right .timeline-dot { left: -13px; }
+
+        .timeline-date { font-size: 14px; color: #b0a5a5; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px; }
+
+        .timeline-content {
+            padding: 15px; background-color: white; border-radius: 20px; 
+            box-shadow: 0 5px 25px rgba(0,0,0,0.06); display: inline-block; 
+            width: 100%; max-width: 300px; text-align: center; transition: transform 0.3s ease;
+        }
+        .timeline-content:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .timeline-content img { width: 100%; border-radius: 12px; object-fit: cover; margin-bottom: 10px; max-height: 250px;}
+        .timeline-content p { font-size: 14px; color: #666; margin-top: 5px; margin-bottom: 5px; line-height: 1.6; }
+        
+        .delete-btn { background: none; border: none; color: #ff9a9e; font-size: 12px; cursor: pointer; text-decoration: underline; margin-top: 10px; padding: 5px;}
+
+        /* ======== 底部悬浮添加按钮 ======== */
+        .add-btn {
+            position: fixed; bottom: 40px; right: 40px;
+            background-color: #ff6b81; color: white; border: none; padding: 15px 25px;
+            border-radius: 30px; font-size: 16px; font-weight: bold;
+            box-shadow: 0 10px 20px rgba(255,107,129,0.3); cursor: pointer; z-index: 100;
+            transition: all 0.3s;
+        }
+        .add-btn:hover { transform: translateY(-5px); box-shadow: 0 15px 25px rgba(255,107,129,0.4); }
+
+        /* ======== 弹窗表单样式 ======== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
+            z-index: 1000; display: none; align-items: center; justify-content: center;
+        }
+        .modal-card {
+            background-color: white; padding: 30px; border-radius: 20px;
+            width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); text-align: center;
+        }
+        .modal-card h3 { color: #ff6b81; margin-top: 0; margin-bottom: 25px; }
+        .modal-card input, .modal-card textarea {
+            width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ffccd5;
+            border-radius: 10px; box-sizing: border-box; font-family: inherit; font-size: 14px;
+        }
+        .modal-card input:focus, .modal-card textarea:focus { outline: none; border-color: #ff6b81; }
+        
+        .file-btn {
+            display: inline-block; background-color: #fdf2f8; color: #ff6b81;
+            padding: 10px 20px; border-radius: 10px; cursor: pointer;
+            border: 1px dashed #ff6b81; width: 100%; box-sizing: border-box; margin-bottom: 5px;
+        }
+        .file-btn input[type="file"] { display: none; }
+        .file-name-hint { font-size: 12px; color: #999; display: block; margin-bottom: 20px;}
+
+        .modal-actions { display: flex; justify-content: space-between; gap: 15px; }
+        .modal-actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .cancel-btn { background-color: #f5f5f5; color: #666; }
+        .cancel-btn:hover { background-color: #e0e0e0; }
+        .save-btn { background-color: #ff6b81; color: white; }
+        .save-btn:hover { background-color: #ff4757; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部小面板 (计时器) -->
+    <div class="timer-panel">
+        <div class="overlay"></div>
+        <div class="content">
+            <h2>我们相伴流年</h2>
+            <div class="timer-container">
+                <div class="time-box"><span id="days" class="number">0</span><span class="label">天</span></div>
+                <div class="time-box"><span id="hours" class="number">00</span><span class="label">时</span></div>
+                <div class="time-box"><span id="minutes" class="number">00</span><span class="label">分</span></div>
+                <div class="time-box"><span id="seconds" class="number">00</span><span class="label">秒</span></div>
+            </div>
+            <p class="date-text">始于 2023.10.17</p>
+        </div>
+    </div>
+
+    <!-- 垂直时间轴 -->
+    <div class="timeline-section">
+        <h3>我们的回忆轨迹 🛤️</h3>
+        
+        <!-- 我们将用 JS 从 Bmob 云端拉取节点塞进去 -->
+        <div class="timeline-container" id="timeline-container">
+            <!-- JS 自动生成 -->
+        </div>
+    </div>
+
+    <!-- 悬浮的添加按钮 -->
+    <button class="add-btn" onclick="openModal()">➕ 记录新回忆</button>
+
+    <!-- 弹出的添加表单 (Modal) -->
+    <div id="add-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h3>💌 写下新的回忆</h3>
+            <input type="text" id="memory-date" placeholder="时间 (例如: 2024.02.14 跨年夜)">
+            <textarea id="memory-text" placeholder="那一天的心情、发生的故事..." rows="3"></textarea>
+            
+            <label class="file-btn">
+                🖼️ 点击选择照片 (可选)
+                <input type="file" id="memory-image" accept="image/*" onchange="previewFile()">
+            </label>
+            <span class="file-name-hint" id="file-name-hint">未选择照片</span>
+            
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeModal()">取消</button>
+                <button class="save-btn" onclick="saveMemory()">封存回忆</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ======= 计时器魔法 =======
+        function updateTimer() {
+            const startDate = new Date("2023-10-17T00:00:00").getTime();
+            const now = new Date().getTime();
+            const diff = now - startDate;
+            document.getElementById("days").innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById("hours").innerText = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+            document.getElementById("minutes").innerText = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+            document.getElementById("seconds").innerText = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+        }
+        updateTimer();
+        setInterval(updateTimer, 1000);
+
+        // ==============================================
+        // ======= 终极魔法：连接 Bmob 后端云金库 !!! =======
+        // ==============================================
+
+        // 这是你给我的密码钥匙
+        const APP_ID = "8e1e8e647e06b88bfde858650f8f3f44";
+        const API_KEY = "63ff0bf3f93f38edca2bc938ec25bd3e";
+        
+        // 告诉代码要把包裹送到 Bmob 上的哪个架子（表名：LoveMemory）
+        const BMOB_URL = "https://api.bmobcloud.com/1/classes/LoveMemory";
+
+        let tempBase64Image = null; // 用来临时存放选中的图片
+
+        // ======== 1. 从云端拉取回忆数据并刷墙 ========
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = '<p style="text-align:center; color:#888;">正在飞速前往云端金库提取回忆...</p>';
+            
+            // 使用浏览器的 Fetch 技术，带着钥匙去库里找东西（按创建时间排序）
+            fetch(BMOB_URL + "?order=createdAt", {
+                method: 'GET',
+                headers: {
+                    "X-Bmob-Application-Id": APP_ID,
+                    "X-Bmob-REST-API-Key": API_KEY,
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const memoryArray = data.results || [];
+                container.innerHTML = ''; 
+                
+                if (memoryArray.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; color:#888;">金库里空空如也，快去点击右下角添加你们的第一条回忆吧！</p>';
+                    return;
+                }
+
+                // 像排版一样，把拉取下来的资料一个个放进界面里
+                memoryArray.forEach((memory, index) => {
+                    const position = index % 2 === 0 ? 'left' : 'right';
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = `timeline-item ${position}`;
+                    
+                    const dataDate = memory.date;
+                    const dataText = memory.text;
+                    const dataImage = memory.image; 
+                    const objectId = memory.objectId; // 这是 Bmob 自动生成的身份证号
+                    
+                    let imageHtml = dataImage ? `<img src="${dataImage}" alt="照片">` : '';
+                    
+                    itemDiv.innerHTML = `
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">${dataDate}</div>
+                        <div class="timeline-content">
+                            ${imageHtml}
+                            <p>${dataText}</p>
+                            <button class="delete-btn" onclick="deleteMemory('${objectId}')">删除这条</button>
+                        </div>
+                    `;
+                    container.appendChild(itemDiv);
+                });
+            })
+            .catch(err => {
+                console.error("网络异常: ", err);
+                container.innerHTML = '<p style="text-align:center; color:#ff6b81;">连接云端失败惹，检查一下网络或者密钥是否正确。</p>';
+            });
+        }
+
+        // 打开填写表单弹窗
+        function openModal() { document.getElementById('add-modal').style.display = 'flex'; }
+        // 关闭填写表单弹窗
+        function closeModal() {
+            document.getElementById('add-modal').style.display = 'none';
+            document.getElementById('memory-date').value = '';
+            document.getElementById('memory-text').value = '';
+            document.getElementById('file-name-hint').innerText = '未选择照片';
+            tempBase64Image = null;
+        }
+
+        // 本地预览照片并转为字符串
+        function previewFile() {
+            const file = document.getElementById('memory-image').files[0];
+            if (file) {
+                // 如果照片太大可能会因为浏览器内存卡主，但在咱们这里没事
+                document.getElementById('file-name-hint').innerText = "已选择: " + file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) { tempBase64Image = e.target.result; };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // ======== 2. 把新写的回忆打包成包裹，寄送给云端金库 ========
+        function saveMemory() {
+            const date = document.getElementById('memory-date').value;
+            const text = document.getElementById('memory-text').value;
+
+            if (!date || !text) { alert("时间和故事是必填的哦！"); return; }
+
+            const btn = document.querySelector('.save-btn');
+            btn.innerText = "正在飞向云端...";
+            btn.disabled = true;
+
+            // 按照 Bmob 的要求，我们把数据包装好
+            const newMemory = { date: date, text: text };
+            if (tempBase64Image) { newMemory.image = tempBase64Image; }
+
+            // 呼叫快递员
+            fetch(BMOB_URL, {
+                method: 'POST',
+                headers: {
+                    "X-Bmob-Application-Id": APP_ID,
+                    "X-Bmob-REST-API-Key": API_KEY,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newMemory)
+            })
+            .then(res => res.json())
+            .then(data => {
+                // 如果金库收到了，就会给我们返回一个 objectId
+                btn.innerText = "封存回忆";
+                btn.disabled = false;
+                closeModal();
+                renderTimeline(); // 保存成功后重新拉取整面墙
+            })
+            .catch(err => {
+                alert("云端拒收了这个包裹: " + err);
+                btn.innerText = "封存回忆";
+                btn.disabled = false;
+            });
+        }
+
+        // ======== 3. 命令云端销毁该记录 ========
+        function deleteMemory(objectId) {
+            if (confirm("真的要从云端彻底删除这条回忆吗？")) {
+                fetch(BMOB_URL + "/" + objectId, {
+                    method: 'DELETE',
+                    headers: {
+                        "X-Bmob-Application-Id": APP_ID,
+                        "X-Bmob-REST-API-Key": API_KEY
+                    }
+                })
+                .then(res => {
+                    renderTimeline(); // 删除成功后刷新
+                })
+                .catch(err => {
+                    alert("删除失败惹: " + err);
+                });
+            }
+        }
+
+        // 网页刚打开时，自动去云端拉取内容
+        window.onload = function() {
+            renderTimeline();
+        };
+    </script>
+</body>
+</html>
