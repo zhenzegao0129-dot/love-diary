@@ -127,6 +127,88 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* ======== 双人课表区域 ======== */
+        .schedule-section { width: 100%; max-width: 850px; margin-top: 70px; }
+        .schedule-section h3 { font-size: 22px; color: #d88391; margin-bottom: 30px; font-weight: normal; letter-spacing: 4px; text-align: center; }
+
+        .schedule-tabs {
+            display: flex; justify-content: center; gap: 0; margin-bottom: 25px;
+        }
+        .schedule-tab {
+            padding: 10px 30px; border: none; font-size: 15px; font-weight: bold;
+            cursor: pointer; transition: all 0.3s; letter-spacing: 2px; font-family: inherit;
+        }
+        .schedule-tab:first-child { border-radius: 12px 0 0 12px; }
+        .schedule-tab:last-child { border-radius: 0 12px 12px 0; }
+        .schedule-tab.active {
+            background: linear-gradient(135deg, #ff6b81, #ff9a9e); color: white;
+            box-shadow: 0 4px 15px rgba(255,107,129,0.3);
+        }
+        .schedule-tab.inactive {
+            background-color: white; color: #999;
+            border: 1px solid #ffccd5;
+        }
+
+        .schedule-grid-wrapper {
+            background-color: white; border-radius: 20px; padding: 20px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.06); overflow-x: auto;
+        }
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 55px repeat(7, 1fr);
+            gap: 3px; min-width: 600px;
+        }
+        .grid-header {
+            background: linear-gradient(135deg, #ff6b81, #ff9a9e); color: white;
+            padding: 10px 4px; text-align: center; font-size: 13px; font-weight: bold;
+            border-radius: 8px; letter-spacing: 1px;
+        }
+        .grid-header.corner { background: transparent; }
+        .grid-time {
+            background-color: #fff5f7; color: #d88391; padding: 8px 4px;
+            text-align: center; font-size: 12px; font-weight: bold;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+        }
+        .grid-cell {
+            min-height: 48px; border-radius: 8px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center; font-size: 11px; padding: 4px;
+            transition: all 0.2s; border: 1px solid #f9f0f2; word-break: break-all;
+        }
+        .grid-cell:hover { transform: scale(1.05); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .grid-cell.has-course {
+            color: white; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            border: none; line-height: 1.3;
+        }
+        .grid-cell.empty { background-color: #fef8f9; }
+        .grid-cell.empty:hover { background-color: #ffecef; }
+
+        /* 课表弹窗 */
+        .course-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
+            z-index: 1001; display: none; align-items: center; justify-content: center;
+        }
+        .course-modal {
+            background-color: white; padding: 30px; border-radius: 20px;
+            width: 90%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); text-align: center;
+        }
+        .course-modal h3 { color: #ff6b81; margin-top: 0; margin-bottom: 20px; }
+        .course-modal input {
+            width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ffccd5;
+            border-radius: 10px; box-sizing: border-box; font-family: inherit; font-size: 14px;
+        }
+        .course-modal input:focus { outline: none; border-color: #ff6b81; }
+        .color-picker-row {
+            display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .color-dot {
+            width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+            border: 3px solid transparent; transition: all 0.2s;
+        }
+        .color-dot:hover { transform: scale(1.2); }
+        .color-dot.selected { border-color: #333; transform: scale(1.2); }
     </style>
 </head>
 <body>
@@ -146,6 +228,31 @@
         </div>
     </div>
 
+    <!-- ======== 双人课表区域 ======== -->
+    <div class="schedule-section">
+        <h3>我们的课表 📚</h3>
+        <div class="schedule-tabs">
+            <button class="schedule-tab active" id="tab-me" onclick="switchTab('me')">🧑 我的课表</button>
+            <button class="schedule-tab inactive" id="tab-ta" onclick="switchTab('ta')">👧 TA的课表</button>
+        </div>
+        
+        <!-- === 周次控制器 === -->
+        <div class="week-controls" style="text-align: center; margin: 15px 0 10px 0; display: flex; align-items: center; justify-content: center; gap: 15px;">
+            <button onclick="changeWeek(-1)" style="border:none; background:none; cursor:pointer; color:#ff6b81; font-weight:bold; font-size:16px;">◀ 上周</button>
+            <div>
+                <div id="week-display" style="font-weight: bold; font-size: 16px; color: #d88391;">本周</div>
+                <div id="week-dates-display" style="font-size: 11px; color: #999; margin-top: 3px;">2026-03-09 ~ 2026-03-15</div>
+            </div>
+            <button onclick="changeWeek(1)" style="border:none; background:none; cursor:pointer; color:#ff6b81; font-weight:bold; font-size:16px;">下周 ▶</button>
+            <button onclick="resetToThisWeek()" style="border:1px solid #ff6b81; background:white; color:#ff6b81; border-radius:12px; padding:3px 10px; font-size:12px; cursor:pointer; margin-left:10px;">回到本周</button>
+        </div>
+        <div class="schedule-grid-wrapper">
+            <div class="schedule-grid" id="schedule-grid">
+                <!-- JS 自动生成网格 -->
+            </div>
+        </div>
+    </div>
+
     <!-- 垂直时间轴 -->
     <div class="timeline-section">
         <h3>我们的回忆轨迹 🛤️</h3>
@@ -153,6 +260,21 @@
         <!-- 我们将用 JS 从 Bmob 云端拉取节点塞进去 -->
         <div class="timeline-container" id="timeline-container">
             <!-- JS 自动生成 -->
+        </div>
+    </div>
+
+    <!-- 课表添加弹窗 -->
+    <div id="course-modal" class="course-modal-overlay">
+        <div class="course-modal">
+            <h3>📖 添加课程</h3>
+            <input type="text" id="course-name" placeholder="课程名称 (如: 高等数学)">
+            <input type="text" id="course-room" placeholder="教室 (如: A301) [可选]">
+            <p style="font-size:13px; color:#999; margin: 5px 0 10px;">选一个喜欢的颜色：</p>
+            <div class="color-picker-row" id="color-picker"></div>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeCourseModal()">取消</button>
+                <button class="save-btn" onclick="saveCourse()">确认添加</button>
+            </div>
         </div>
     </div>
 
@@ -343,9 +465,232 @@
             }
         }
 
+        // =============================================
+        // ======= 双人课表模块 =======
+        // =============================================
+        const SCHEDULE_URL = "https://api.bmobcloud.com/1/classes/CourseSchedule";
+
+        const COURSE_COLORS = [
+            '#ff6b81', '#ff9a9e', '#a29bfe', '#74b9ff',
+            '#55efc4', '#ffeaa7', '#fd79a8', '#00cec9',
+            '#e17055', '#6c5ce7', '#81ecec', '#fab1a0'
+        ];
+        const DAYS = ['一', '二', '三', '四', '五', '六', '日'];
+        const PERIODS = 12; // 一天最多 12 节课
+
+        let currentTab = 'me'; // 当前选中的 Tab
+        let selectedColor = COURSE_COLORS[0]; // 默认颜色
+        let pendingDay = null; // 即将添加课程的「星期几」
+        let pendingPeriod = null; // 即将添加课程的「第几节」
+        let courseCache = []; // 缓存从云端拉取的课程数据
+        let currentViewDate = new Date(); // 当前查看的周的时间基准
+
+        // 格式化日期 YYYY-MM-DD
+        function formatDate(d) {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // 获取某天所在周的周一到周日日期数组
+        function getWeekDates(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // 调整倒退到周一
+            const monday = new Date(d.setDate(diff));
+            
+            const weekDates = [];
+            for (let i = 0; i < 7; i++) {
+                const temp = new Date(monday);
+                temp.setDate(monday.getDate() + i);
+                weekDates.push(formatDate(temp));
+            }
+            return weekDates;
+        }
+
+        // 切换周
+        function changeWeek(offset) {
+            currentViewDate.setDate(currentViewDate.getDate() + offset * 7);
+            renderScheduleGrid();
+        }
+        
+        // 回到本周
+        function resetToThisWeek() {
+            currentViewDate = new Date();
+            renderScheduleGrid();
+        }
+
+        // 切换 Tab
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('tab-me').className = tab === 'me' ? 'schedule-tab active' : 'schedule-tab inactive';
+            document.getElementById('tab-ta').className = tab === 'ta' ? 'schedule-tab active' : 'schedule-tab inactive';
+            renderScheduleGrid();
+        }
+
+        // 生成课表网格
+        function renderScheduleGrid() {
+            const grid = document.getElementById('schedule-grid');
+            grid.innerHTML = '';
+
+            const weekDates = getWeekDates(currentViewDate);
+            
+            // 计算第几周 (开学第一周基准：我=3月9日，TA=3月2日)
+            const startDateStr = currentTab === 'me' ? '2026-03-09' : '2026-03-02';
+            const startDate = new Date(startDateStr);
+            const currentMonday = new Date(weekDates[0]);
+            const diffTime = currentMonday - startDate;
+            const weekNumber = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7)) + 1;
+            
+            document.getElementById('week-display').innerText = `第 ${weekNumber} 周`;
+            document.getElementById('week-dates-display').innerText = `${weekDates[0]} ~ ${weekDates[6]}`;
+
+            // 第一行：表头（角 + 周一~周日加上具体日期）
+            grid.innerHTML += '<div class="grid-header corner"></div>';
+            DAYS.forEach((d, index) => { 
+                const dateNum = weekDates[index].substring(5); // 取 MM-DD
+                grid.innerHTML += `<div class="grid-header">周${d}<br><span style="font-size:9px;font-weight:normal">${dateNum}</span></div>`; 
+            });
+
+            // 逐行生成：第 1~12 节
+            for (let p = 1; p <= PERIODS; p++) {
+                grid.innerHTML += `<div class="grid-time">第${p}节</div>`;
+                for (let d = 0; d < 7; d++) {
+                    const targetDate = weekDates[d];
+                    const course = findCourseByDate(currentTab, d, p, targetDate);
+                    if (course) {
+                        const content = `<span style="font-weight:bold;font-size:12px;">${course.name}</span><br><span style="font-size:10px;opacity:0.9">${course.room || ''}</span>`;
+                        grid.innerHTML += `<div class="grid-cell has-course" style="background:${course.color}" onclick="deleteCourse('${course.objectId}')" title="点击删除">${content}</div>`;
+                    } else {
+                        grid.innerHTML += `<div class="grid-cell empty" onclick="openCourseModal(${d}, ${p})" title="点击添加课程"></div>`;
+                    }
+                }
+            }
+        }
+
+        // 在缓存中查找匹配当前日期和节次的课程
+        function findCourseByDate(owner, day, period, targetDate) {
+            return courseCache.find(c => {
+                if (c.owner !== owner || c.day !== day || c.period !== period) return false;
+                // 新的 ICS 数据有 dates 数组，旧的可能没有
+                if (c.dates && Array.isArray(c.dates)) {
+                    return c.dates.includes(targetDate);
+                }
+                return true; // 如果没有 dates 字段（比如手动临时添加的），默认显示
+            });
+        }
+
+        // 从云端拉取课表数据
+        function loadSchedule() {
+            fetch(SCHEDULE_URL + '?limit=500&order=period', {
+                method: 'GET',
+                headers: {
+                    "X-Bmob-Application-Id": APP_ID,
+                    "X-Bmob-REST-API-Key": API_KEY,
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                courseCache = data.results || [];
+                renderScheduleGrid();
+            })
+            .catch(err => {
+                console.error('课表加载失败:', err);
+                renderScheduleGrid();
+            });
+        }
+
+        // 打开添加课程弹窗
+        function openCourseModal(day, period) {
+            pendingDay = day;
+            pendingPeriod = period;
+            selectedColor = COURSE_COLORS[0];
+            document.getElementById('course-name').value = '';
+            document.getElementById('course-room').value = '';
+            renderColorPicker();
+            document.getElementById('course-modal').style.display = 'flex';
+        }
+        function closeCourseModal() {
+            document.getElementById('course-modal').style.display = 'none';
+        }
+
+        // 渲染颜色选择器
+        function renderColorPicker() {
+            const row = document.getElementById('color-picker');
+            row.innerHTML = '';
+            COURSE_COLORS.forEach(c => {
+                const cls = c === selectedColor ? 'color-dot selected' : 'color-dot';
+                row.innerHTML += `<div class="${cls}" style="background:${c}" onclick="pickColor('${c}')"></div>`;
+            });
+        }
+        function pickColor(c) {
+            selectedColor = c;
+            renderColorPicker();
+        }
+
+        // 保存课程到云端
+        function saveCourse() {
+            const name = document.getElementById('course-name').value.trim();
+            const room = document.getElementById('course-room').value.trim();
+            if (!name) { alert('课程名称不能为空哦！'); return; }
+
+            const btn = document.querySelector('#course-modal .save-btn');
+            btn.innerText = '保存中...';
+            btn.disabled = true;
+
+            const newCourse = {
+                owner: currentTab,
+                day: pendingDay,
+                period: pendingPeriod,
+                name: name,
+                room: room,
+                color: selectedColor
+            };
+
+            fetch(SCHEDULE_URL, {
+                method: 'POST',
+                headers: {
+                    "X-Bmob-Application-Id": APP_ID,
+                    "X-Bmob-REST-API-Key": API_KEY,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newCourse)
+            })
+            .then(res => res.json())
+            .then(() => {
+                btn.innerText = '确认添加';
+                btn.disabled = false;
+                closeCourseModal();
+                loadSchedule();
+            })
+            .catch(err => {
+                alert('保存失败: ' + err);
+                btn.innerText = '确认添加';
+                btn.disabled = false;
+            });
+        }
+
+        // 删除课程
+        function deleteCourse(objectId) {
+            if (confirm('删除这节课吗？')) {
+                fetch(SCHEDULE_URL + '/' + objectId, {
+                    method: 'DELETE',
+                    headers: {
+                        "X-Bmob-Application-Id": APP_ID,
+                        "X-Bmob-REST-API-Key": API_KEY
+                    }
+                })
+                .then(() => loadSchedule())
+                .catch(err => alert('删除失败: ' + err));
+            }
+        }
+
         // 网页刚打开时，自动去云端拉取内容
         window.onload = function() {
             renderTimeline();
+            loadSchedule();
         };
     </script>
 </body>
