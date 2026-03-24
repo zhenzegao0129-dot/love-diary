@@ -1402,6 +1402,7 @@
         function renderScheduleGrid() {
             const grid = document.getElementById('schedule-grid');
             grid.innerHTML = '';
+            grid.style.display = 'grid';
             grid.style.transform = 'none';
             grid.style.width = '100%';
             grid.parentElement.style.height = 'auto';
@@ -1421,42 +1422,34 @@
             document.getElementById('week-dates-display').innerText = `${weekDates[0]} ~ ${weekDates[6]}`;
 
             if (isMobile) {
-                // ====== 手机端：竖向卡片式课表 ======
-                grid.style.display = 'block';
-                let html = '';
-                for (let d = 0; d < 7; d++) {
-                    const dateNum = weekDates[d].substring(5);
-                    // 收集这一天的所有课程
-                    let dayCourses = [];
-                    for (let p = 1; p <= PERIODS; p++) {
-                        const course = findCourseByDate(currentTab, d, p, weekDates[d]);
+                // ====== 手机端：紧凑原生适配网格 ======
+                grid.style.gridTemplateColumns = '22px repeat(7, 1fr)';
+                grid.style.gap = '1px';
+
+                // 表头：极简（一 二 三 ... + 日期数字）
+                grid.innerHTML += '<div class="grid-header corner" style="font-size:9px;"></div>';
+                for (let i = 0; i < 7; i++) {
+                    const dayDate = weekDates[i].substring(8); // 只取日期的“DD”
+                    grid.innerHTML += `<div class="grid-header" style="font-size:11px; padding:4px 0; letter-spacing:0;">${DAYS[i]}<br><span style="font-size:8px;font-weight:normal;opacity:0.8;">${dayDate}</span></div>`;
+                }
+
+                // 课程格子
+                for (let p = 1; p <= PERIODS; p++) {
+                    grid.innerHTML += `<div class="grid-time" style="font-size:8px; padding:2px 0;">${p}</div>`;
+                    for (let d = 0; d < 7; d++) {
+                        const targetDate = weekDates[d];
+                        const course = findCourseByDate(currentTab, d, p, targetDate);
                         if (course) {
-                            dayCourses.push({ period: p, ...course });
+                            grid.innerHTML += `<div class="grid-cell has-course" style="background:${course.color}; font-size:8px; padding:2px 1px; line-height:1.15; min-height:45px;" onclick="deleteCourse('${course.objectId}')">${course.name}<br><span style="font-size:7px;opacity:0.85;font-weight:normal;">${course.room || ''}</span></div>`;
+                        } else {
+                            grid.innerHTML += `<div class="grid-cell empty" style="min-height:45px;" onclick="openCourseModal(${d}, ${p})"></div>`;
                         }
                     }
-
-                    html += `<div style="margin-bottom:8px; border-radius:12px; overflow:hidden; border:1px solid #ffecef;">`;
-                    html += `<div style="background:linear-gradient(135deg,#ff6b81,#ff9a9e); color:white; padding:8px 12px; font-size:14px; font-weight:bold; display:flex; justify-content:space-between;">`;
-                    html += `<span>周${DAYS[d]}</span><span style="font-size:12px; opacity:0.8;">${dateNum}</span></div>`;
-
-                    if (dayCourses.length === 0) {
-                        html += `<div style="padding:12px; text-align:center; color:#ccc; font-size:12px; background:white;">这天没有课 ✨</div>`;
-                    } else {
-                        dayCourses.forEach(c => {
-                            html += `<div onclick="deleteCourse('${c.objectId}')" style="display:flex; align-items:center; padding:8px 12px; background:white; border-bottom:1px solid #f9f0f2; cursor:pointer;">`;
-                            html += `<div style="width:40px; font-size:11px; color:#999; flex-shrink:0;">第${c.period}节</div>`;
-                            html += `<div style="flex:1; background:${c.color}; color:white; border-radius:8px; padding:6px 10px; font-size:12px; font-weight:bold; text-shadow:0 1px 2px rgba(0,0,0,0.2);">`;
-                            html += `${c.name} <span style="font-size:10px; opacity:0.85; font-weight:normal;">${c.room || ''}</span>`;
-                            html += `</div></div>`;
-                        });
-                    }
-                    html += `</div>`;
                 }
-                grid.innerHTML = html;
             } else {
-                // ====== 电脑端：保持原来的网格式课表 ======
-                grid.style.display = 'grid';
+                // ====== 电脑端：原样网格 ======
                 grid.style.gridTemplateColumns = '55px repeat(7, 1fr)';
+                grid.style.gap = '3px';
 
                 grid.innerHTML += '<div class="grid-header corner"></div>';
                 for (let i = 0; i < 7; i++) {
