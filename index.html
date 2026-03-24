@@ -810,8 +810,8 @@
             }
             .schedule-grid {
                 min-width: 100%; /* 取消固定宽度 */
-                grid-template-columns: 32px repeat(7, 1fr); /* 节次列缩窄 */
-                gap: 2px;
+                grid-template-columns: 32px repeat(7, minmax(0, 1fr)); /* 关键修复：强制子元素不能超宽 */
+                gap: 1px; /* 进一步挤出空间 */
             }
             .grid-header {
                 font-size: 11px;
@@ -825,10 +825,12 @@
                 padding: 5px 0;
             }
             .grid-cell {
-                padding: 2px;
+                padding: 2px 1px;
                 min-height: 40px;
                 line-height: 1.1;
                 font-size: 9px;
+                word-wrap: break-word; /* 强制换行 */
+                word-break: break-all;
             }
             .grid-cell span {
                 font-size: 9px !important;
