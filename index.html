@@ -430,14 +430,24 @@
             border-radius: 20px;
             padding: 20px;
             box-shadow: 0 5px 25px rgba(0, 0, 0, 0.06);
-            overflow-x: auto;
+            overflow-x: hidden;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .schedule-grid {
             display: grid;
-            grid-template-columns: 55px repeat(7, 1fr);
-            gap: 3px;
-            min-width: 600px;
+            grid-template-columns: 24px repeat(7, minmax(0, 1fr));
+            gap: 1px;
+            width: 100%;
+        }
+
+        /* 电脑端课表稍微宽松 */
+        @media (min-width: 769px) {
+            .schedule-grid {
+                grid-template-columns: 55px repeat(7, 1fr);
+                gap: 3px;
+            }
         }
 
         .grid-header {
