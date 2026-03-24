@@ -804,8 +804,41 @@
                 color: #ff6b81;
             }
             
-            /* 课表适配：允许横向滑动 */
-            .schedule-grid { min-width: 500px; }
+            /* 课表适配：完整塞满整屏，不再横向滑动 */
+            .schedule-grid-wrapper {
+                padding: 10px 5px; /* 减少外边距腾出空间 */
+            }
+            .schedule-grid {
+                min-width: 100%; /* 取消固定宽度 */
+                grid-template-columns: 32px repeat(7, 1fr); /* 节次列缩窄 */
+                gap: 2px;
+            }
+            .grid-header {
+                font-size: 11px;
+                padding: 6px 0;
+            }
+            .grid-header span {
+                font-size: 8px !important;
+            }
+            .grid-time {
+                font-size: 10px;
+                padding: 5px 0;
+            }
+            .grid-cell {
+                padding: 2px;
+                min-height: 40px;
+                line-height: 1.1;
+                font-size: 9px;
+            }
+            .grid-cell span {
+                font-size: 9px !important;
+            }
+            .grid-cell br + span {
+                font-size: 8px !important;
+                opacity: 0.8;
+                display: block;
+                margin-top: 1px;
+            }
 
             /* 按钮和弹窗微调 */
             .add-btn {
