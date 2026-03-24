@@ -494,10 +494,11 @@
         }
 
         .grid-cell {
-            min-height: 48px;
+            min-height: 55px;
             border-radius: 8px;
             cursor: pointer;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
@@ -1401,26 +1402,15 @@
         function renderScheduleGrid() {
             const grid = document.getElementById('schedule-grid');
             grid.innerHTML = '';
+            grid.style.transform = 'none';
+            grid.style.width = '100%';
+            grid.parentElement.style.height = 'auto';
+            grid.parentElement.style.overflow = '';
 
             const weekDates = getWeekDates(currentViewDate);
             const isMobile = window.innerWidth < 768;
-            const showDays = 7;
 
-            // 动态设置网格列数
-            grid.style.gridTemplateColumns = '30px repeat(7, minmax(0, 1fr))';
-
-            // 手机端：给网格设定固定宽度，等渲染完再缩放
-            if (isMobile) {
-                grid.style.width = '520px';
-            } else {
-                grid.style.width = '100%';
-                grid.style.gridTemplateColumns = '55px repeat(7, 1fr)';
-                grid.style.transform = 'none';
-                grid.parentElement.style.height = 'auto';
-                grid.parentElement.style.overflow = '';
-            }
-
-            // 计算第几周 (开学第一周基准：我=3月9日，TA=3月2日)
+            // 计算第几周
             const startDateStr = currentTab === 'me' ? '2026-03-09' : '2026-03-02';
             const startDate = new Date(startDateStr);
             const currentMonday = new Date(weekDates[0]);
@@ -1428,42 +1418,65 @@
             const weekNumber = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7)) + 1;
 
             document.getElementById('week-display').innerText = `第 ${weekNumber} 周`;
-            document.getElementById('week-dates-display').innerText = `${weekDates[0]} ~ ${weekDates[showDays - 1]}`;
+            document.getElementById('week-dates-display').innerText = `${weekDates[0]} ~ ${weekDates[6]}`;
 
-            // 第一行：表头（角 + 周一~周五/日加上具体日期）
-            grid.innerHTML += '<div class="grid-header corner"></div>';
-            for (let i = 0; i < showDays; i++) {
-                const dateNum = weekDates[i].substring(5); // 取 MM-DD
-                grid.innerHTML += `<div class="grid-header">周${DAYS[i]}<br><span style="font-size:9px;font-weight:normal">${dateNum}</span></div>`;
-            }
+            if (isMobile) {
+                // ====== 手机端：竖向卡片式课表 ======
+                grid.style.display = 'block';
+                let html = '';
+                for (let d = 0; d < 7; d++) {
+                    const dateNum = weekDates[d].substring(5);
+                    // 收集这一天的所有课程
+                    let dayCourses = [];
+                    for (let p = 1; p <= PERIODS; p++) {
+                        const course = findCourseByDate(currentTab, d, p, weekDates[d]);
+                        if (course) {
+                            dayCourses.push({ period: p, ...course });
+                        }
+                    }
 
-            // 逐行生成：第 1~12 节
-            for (let p = 1; p <= PERIODS; p++) {
-                grid.innerHTML += `<div class="grid-time">第${p}节</div>`;
-                for (let d = 0; d < showDays; d++) {
-                    const targetDate = weekDates[d];
-                    const course = findCourseByDate(currentTab, d, p, targetDate);
-                    if (course) {
-                        const content = `<span class="course-name">${course.name}</span><br><span class="course-room">${course.room || ''}</span>`;
-                        grid.innerHTML += `<div class="grid-cell has-course" style="background:${course.color}" onclick="deleteCourse('${course.objectId}')" title="点击删除">${content}</div>`;
+                    html += `<div style="margin-bottom:8px; border-radius:12px; overflow:hidden; border:1px solid #ffecef;">`;
+                    html += `<div style="background:linear-gradient(135deg,#ff6b81,#ff9a9e); color:white; padding:8px 12px; font-size:14px; font-weight:bold; display:flex; justify-content:space-between;">`;
+                    html += `<span>周${DAYS[d]}</span><span style="font-size:12px; opacity:0.8;">${dateNum}</span></div>`;
+
+                    if (dayCourses.length === 0) {
+                        html += `<div style="padding:12px; text-align:center; color:#ccc; font-size:12px; background:white;">这天没有课 ✨</div>`;
                     } else {
-                        grid.innerHTML += `<div class="grid-cell empty" onclick="openCourseModal(${d}, ${p})" title="点击添加课程"></div>`;
+                        dayCourses.forEach(c => {
+                            html += `<div onclick="deleteCourse('${c.objectId}')" style="display:flex; align-items:center; padding:8px 12px; background:white; border-bottom:1px solid #f9f0f2; cursor:pointer;">`;
+                            html += `<div style="width:40px; font-size:11px; color:#999; flex-shrink:0;">第${c.period}节</div>`;
+                            html += `<div style="flex:1; background:${c.color}; color:white; border-radius:8px; padding:6px 10px; font-size:12px; font-weight:bold; text-shadow:0 1px 2px rgba(0,0,0,0.2);">`;
+                            html += `${c.name} <span style="font-size:10px; opacity:0.85; font-weight:normal;">${c.room || ''}</span>`;
+                            html += `</div></div>`;
+                        });
+                    }
+                    html += `</div>`;
+                }
+                grid.innerHTML = html;
+            } else {
+                // ====== 电脑端：保持原来的网格式课表 ======
+                grid.style.display = 'grid';
+                grid.style.gridTemplateColumns = '55px repeat(7, 1fr)';
+
+                grid.innerHTML += '<div class="grid-header corner"></div>';
+                for (let i = 0; i < 7; i++) {
+                    const dateNum = weekDates[i].substring(5);
+                    grid.innerHTML += `<div class="grid-header">周${DAYS[i]}<br><span style="font-size:9px;font-weight:normal">${dateNum}</span></div>`;
+                }
+
+                for (let p = 1; p <= PERIODS; p++) {
+                    grid.innerHTML += `<div class="grid-time">第${p}节</div>`;
+                    for (let d = 0; d < 7; d++) {
+                        const targetDate = weekDates[d];
+                        const course = findCourseByDate(currentTab, d, p, targetDate);
+                        if (course) {
+                            const content = `<span class="course-name">${course.name}</span><br><span class="course-room">${course.room || ''}</span>`;
+                            grid.innerHTML += `<div class="grid-cell has-course" style="background:${course.color}" onclick="deleteCourse('${course.objectId}')" title="点击删除">${content}</div>`;
+                        } else {
+                            grid.innerHTML += `<div class="grid-cell empty" onclick="openCourseModal(${d}, ${p})" title="点击添加课程"></div>`;
+                        }
                     }
                 }
-            }
-
-            // 手机端：等内容渲染完毕后再缩放
-            if (isMobile) {
-                setTimeout(() => {
-                    const availableWidth = grid.parentElement.clientWidth;
-                    const gridRealWidth = 520;
-                    const scaleFactor = Math.min(1, availableWidth / gridRealWidth);
-                    grid.style.transform = `scale(${scaleFactor})`;
-                    grid.style.transformOrigin = 'top left';
-                    const realHeight = grid.scrollHeight;
-                    grid.parentElement.style.height = Math.ceil(realHeight * scaleFactor) + 'px';
-                    grid.parentElement.style.overflow = 'hidden';
-                }, 50);
             }
         }
 
