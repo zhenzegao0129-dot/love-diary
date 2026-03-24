@@ -513,6 +513,16 @@
             line-height: 1.3;
         }
 
+        .course-name {
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .course-room {
+            font-size: 10px;
+            opacity: 0.9;
+        }
+
         .grid-cell.empty {
             background-color: #fef8f9;
         }
@@ -856,17 +866,15 @@
                 word-break: break-all;
                 overflow: hidden !important; 
             }
-            .grid-cell span {
+            .course-name {
                 font-size: 9px !important;
-                letter-spacing: -0.5px; /* 把字间距缩一缩 */
+                letter-spacing: -0.5px;
             }
-            .grid-cell br + span {
+            .course-room {
                 font-size: 7px !important;
                 opacity: 0.8;
                 display: block;
                 margin-top: 1px;
-                transform: scale(0.9);
-                transform-origin: left top;
             }
 
             /* 按钮和弹窗微调 */
@@ -1349,6 +1357,28 @@
             grid.innerHTML = '';
 
             const weekDates = getWeekDates(currentViewDate);
+            const isMobile = window.innerWidth < 768;
+            const showDays = 7; // 始终显示周一~周日
+
+            // 手机端用缩放让整个课表塞进屏幕
+            if (isMobile) {
+                const availableWidth = window.innerWidth - 20; // 减掉左右边距
+                const gridNaturalWidth = 520; // 课表的自然宽度
+                const scaleFactor = Math.min(1, availableWidth / gridNaturalWidth);
+                grid.style.transform = `scale(${scaleFactor})`;
+                grid.style.transformOrigin = 'top left';
+                grid.style.width = gridNaturalWidth + 'px';
+                // 调整父容器高度来适配缩放后的高度
+                grid.parentElement.style.height = (grid.scrollHeight * scaleFactor) + 'px';
+                grid.parentElement.style.overflow = 'hidden';
+            } else {
+                grid.style.transform = 'none';
+                grid.style.width = '100%';
+                grid.parentElement.style.height = 'auto';
+            }
+
+            // 动态设置网格列数
+            grid.style.gridTemplateColumns = (isMobile ? '30px' : '55px') + ` repeat(${showDays}, minmax(0, 1fr))`;
 
             // 计算第几周 (开学第一周基准：我=3月9日，TA=3月2日)
             const startDateStr = currentTab === 'me' ? '2026-03-09' : '2026-03-02';
@@ -1358,23 +1388,23 @@
             const weekNumber = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7)) + 1;
 
             document.getElementById('week-display').innerText = `第 ${weekNumber} 周`;
-            document.getElementById('week-dates-display').innerText = `${weekDates[0]} ~ ${weekDates[6]}`;
+            document.getElementById('week-dates-display').innerText = `${weekDates[0]} ~ ${weekDates[showDays - 1]}`;
 
-            // 第一行：表头（角 + 周一~周日加上具体日期）
+            // 第一行：表头（角 + 周一~周五/日加上具体日期）
             grid.innerHTML += '<div class="grid-header corner"></div>';
-            DAYS.forEach((d, index) => {
-                const dateNum = weekDates[index].substring(5); // 取 MM-DD
-                grid.innerHTML += `<div class="grid-header">周${d}<br><span style="font-size:9px;font-weight:normal">${dateNum}</span></div>`;
-            });
+            for (let i = 0; i < showDays; i++) {
+                const dateNum = weekDates[i].substring(5); // 取 MM-DD
+                grid.innerHTML += `<div class="grid-header">周${DAYS[i]}<br><span style="font-size:9px;font-weight:normal">${dateNum}</span></div>`;
+            }
 
             // 逐行生成：第 1~12 节
             for (let p = 1; p <= PERIODS; p++) {
                 grid.innerHTML += `<div class="grid-time">第${p}节</div>`;
-                for (let d = 0; d < 7; d++) {
+                for (let d = 0; d < showDays; d++) {
                     const targetDate = weekDates[d];
                     const course = findCourseByDate(currentTab, d, p, targetDate);
                     if (course) {
-                        const content = `<span style="font-weight:bold;font-size:12px;">${course.name}</span><br><span style="font-size:10px;opacity:0.9">${course.room || ''}</span>`;
+                        const content = `<span class="course-name">${course.name}</span><br><span class="course-room">${course.room || ''}</span>`;
                         grid.innerHTML += `<div class="grid-cell has-course" style="background:${course.color}" onclick="deleteCourse('${course.objectId}')" title="点击删除">${content}</div>`;
                     } else {
                         grid.innerHTML += `<div class="grid-cell empty" onclick="openCourseModal(${d}, ${p})" title="点击添加课程"></div>`;
