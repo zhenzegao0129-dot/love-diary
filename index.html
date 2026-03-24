@@ -1,33 +1,34 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <title>我们的专属小站</title>
     <style>
         body {
-            background-color: #fdf2f8; 
-            font-family: "Microsoft YaHei", sans-serif; 
+            background-color: #fdf2f8;
+            font-family: "Microsoft YaHei", sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
             min-height: 100vh;
-            margin: 0;             
-            padding: 80px 20px 100px 20px; 
+            margin: 0;
+            padding: 80px 20px 100px 20px;
             box-sizing: border-box;
         }
 
         /* ======== 顶部小面板 ======== */
         .timer-panel {
             background-image: url('hezhao.jpg');
-            background-size: cover;          
-            background-position: center;     
+            background-size: cover;
+            background-position: center;
             width: 320px;
-            height: 420px; 
-            border-radius: 20px;       
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15); 
+            height: 420px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
             position: relative;
-            overflow: hidden;          
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -35,182 +36,730 @@
             text-align: center;
             z-index: 5;
         }
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.45); z-index: 1; }
-        .content { position: relative; z-index: 2; color: white; width: 100%; }
-        .content h2 { font-size: 22px; margin-bottom: 40px; font-weight: 400; letter-spacing: 3px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .timer-container { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; }
-        .time-box { background-color: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); border-radius: 12px; padding: 12px 6px; min-width: 55px; border: 1px solid rgba(255, 255, 255, 0.25); }
-        .number { display: block; font-size: 26px; font-weight: bold; font-family: "Arial", sans-serif; }
-        .label { display: block; font-size: 12px; margin-top: 5px; opacity: 0.9; }
-        .date-text { font-size: 13px; opacity: 0.8; margin-top: 15px; letter-spacing: 1px; }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            color: white;
+            width: 100%;
+        }
+
+        .content h2 {
+            font-size: 22px;
+            margin-bottom: 40px;
+            font-weight: 400;
+            letter-spacing: 3px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .time-box {
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 12px 6px;
+            min-width: 55px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .number {
+            display: block;
+            font-size: 26px;
+            font-weight: bold;
+            font-family: "Arial", sans-serif;
+        }
+
+        .label {
+            display: block;
+            font-size: 12px;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        .date-text {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: 15px;
+            letter-spacing: 1px;
+        }
 
         /* ======== 垂直时间轴相册墙 ======== */
-        .timeline-section { width: 100%; max-width: 800px; margin-top: 60px; }
-        .timeline-section h3 { font-size: 22px; color: #d88391; margin-bottom: 60px; font-weight: normal; letter-spacing: 4px; text-align: center; }
-        
-        .timeline-container { position: relative; margin: 0 auto; padding: 20px 0; }
+        .timeline-section {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 60px;
+        }
+
+        .timeline-section h3 {
+            font-size: 22px;
+            color: #d88391;
+            margin-bottom: 60px;
+            font-weight: normal;
+            letter-spacing: 4px;
+            text-align: center;
+        }
+
+        .timeline-container {
+            position: relative;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
         .timeline-container::after {
-            content: ''; position: absolute; width: 4px; background-color: #ffccd5;
-            top: 0; bottom: 0; left: 50%; margin-left: -2px; border-radius: 2px;
+            content: '';
+            position: absolute;
+            width: 4px;
+            background-color: #ffccd5;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+            border-radius: 2px;
         }
 
         .timeline-item {
-            padding: 10px 40px; position: relative; width: 50%; box-sizing: border-box; text-align: right;
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            box-sizing: border-box;
+            text-align: right;
             animation: fadeIn 0.5s ease;
         }
-        .timeline-item.right { left: 50%; text-align: left; }
-        .timeline-item.left { left: 0; }
+
+        .timeline-item.right {
+            left: 50%;
+            text-align: left;
+        }
+
+        .timeline-item.left {
+            left: 0;
+        }
 
         .timeline-dot {
-            position: absolute; width: 18px; height: 18px; right: -13px;
-            background-color: #ff6b81; border: 4px solid #fff; top: 25px;
-            border-radius: 50%; z-index: 1; box-shadow: 0 0 10px rgba(255,107,129,0.3);
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            right: -13px;
+            background-color: #ff6b81;
+            border: 4px solid #fff;
+            top: 25px;
+            border-radius: 50%;
+            z-index: 1;
+            box-shadow: 0 0 10px rgba(255, 107, 129, 0.3);
         }
-        .timeline-item.right .timeline-dot { left: -13px; }
 
-        .timeline-date { font-size: 14px; color: #b0a5a5; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px; }
+        .timeline-item.right .timeline-dot {
+            left: -13px;
+        }
+
+        .timeline-date {
+            font-size: 14px;
+            color: #b0a5a5;
+            font-weight: bold;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
 
         .timeline-content {
-            padding: 15px; background-color: white; border-radius: 20px; 
-            box-shadow: 0 5px 25px rgba(0,0,0,0.06); display: inline-block; 
-            width: 100%; max-width: 300px; text-align: center; transition: transform 0.3s ease;
+            padding: 15px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.06);
+            display: inline-block;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+            transition: transform 0.3s ease;
         }
-        .timeline-content:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .timeline-content img { width: 100%; border-radius: 12px; object-fit: cover; margin-bottom: 10px; max-height: 250px;}
-        .timeline-content p { font-size: 14px; color: #666; margin-top: 5px; margin-bottom: 5px; line-height: 1.6; }
-        
-        .delete-btn { background: none; border: none; color: #ff9a9e; font-size: 12px; cursor: pointer; text-decoration: underline; margin-top: 10px; padding: 5px;}
+
+        .timeline-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-content img {
+            width: 100%;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-bottom: 10px;
+            max-height: 250px;
+        }
+
+        .timeline-content p {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            line-height: 1.6;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ff9a9e;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 10px;
+            padding: 5px;
+        }
 
         /* ======== 底部悬浮添加按钮 ======== */
         .add-btn {
-            position: fixed; bottom: 40px; right: 40px;
-            background-color: #ff6b81; color: white; border: none; padding: 15px 25px;
-            border-radius: 30px; font-size: 16px; font-weight: bold;
-            box-shadow: 0 10px 20px rgba(255,107,129,0.3); cursor: pointer; z-index: 100;
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background-color: #ff6b81;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(255, 107, 129, 0.3);
+            cursor: pointer;
+            z-index: 100;
             transition: all 0.3s;
         }
-        .add-btn:hover { transform: translateY(-5px); box-shadow: 0 15px 25px rgba(255,107,129,0.4); }
+
+        .add-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(255, 107, 129, 0.4);
+        }
 
         /* ======== 弹窗表单样式 ======== */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
-            z-index: 1000; display: none; align-items: center; justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
         }
-        .modal-card {
-            background-color: white; padding: 30px; border-radius: 20px;
-            width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); text-align: center;
-        }
-        .modal-card h3 { color: #ff6b81; margin-top: 0; margin-bottom: 25px; }
-        .modal-card input, .modal-card textarea {
-            width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ffccd5;
-            border-radius: 10px; box-sizing: border-box; font-family: inherit; font-size: 14px;
-        }
-        .modal-card input:focus, .modal-card textarea:focus { outline: none; border-color: #ff6b81; }
-        
-        .file-btn {
-            display: inline-block; background-color: #fdf2f8; color: #ff6b81;
-            padding: 10px 20px; border-radius: 10px; cursor: pointer;
-            border: 1px dashed #ff6b81; width: 100%; box-sizing: border-box; margin-bottom: 5px;
-        }
-        .file-btn input[type="file"] { display: none; }
-        .file-name-hint { font-size: 12px; color: #999; display: block; margin-bottom: 20px;}
 
-        .modal-actions { display: flex; justify-content: space-between; gap: 15px; }
-        .modal-actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s;}
-        .cancel-btn { background-color: #f5f5f5; color: #666; }
-        .cancel-btn:hover { background-color: #e0e0e0; }
-        .save-btn { background-color: #ff6b81; color: white; }
-        .save-btn:hover { background-color: #ff4757; }
+        .modal-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .modal-card h3 {
+            color: #ff6b81;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .modal-card input,
+        .modal-card textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ffccd5;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .modal-card input:focus,
+        .modal-card textarea:focus {
+            outline: none;
+            border-color: #ff6b81;
+        }
+
+        .file-btn {
+            display: inline-block;
+            background-color: #fdf2f8;
+            color: #ff6b81;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px dashed #ff6b81;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 5px;
+        }
+
+        .file-btn input[type="file"] {
+            display: none;
+        }
+
+        .file-name-hint {
+            font-size: 12px;
+            color: #999;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .cancel-btn {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+
+        .cancel-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .save-btn {
+            background-color: #ff6b81;
+            color: white;
+        }
+
+        .save-btn:hover {
+            background-color: #ff4757;
+        }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* ======== 双人课表区域 ======== */
-        .schedule-section { width: 100%; max-width: 850px; margin-top: 70px; }
-        .schedule-section h3 { font-size: 22px; color: #d88391; margin-bottom: 30px; font-weight: normal; letter-spacing: 4px; text-align: center; }
+        .schedule-section {
+            width: 100%;
+            max-width: 850px;
+            margin-top: 70px;
+        }
+
+        .schedule-section h3 {
+            font-size: 22px;
+            color: #d88391;
+            margin-bottom: 30px;
+            font-weight: normal;
+            letter-spacing: 4px;
+            text-align: center;
+        }
 
         .schedule-tabs {
-            display: flex; justify-content: center; gap: 0; margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 25px;
         }
+
         .schedule-tab {
-            padding: 10px 30px; border: none; font-size: 15px; font-weight: bold;
-            cursor: pointer; transition: all 0.3s; letter-spacing: 2px; font-family: inherit;
+            padding: 10px 30px;
+            border: none;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+            font-family: inherit;
         }
-        .schedule-tab:first-child { border-radius: 12px 0 0 12px; }
-        .schedule-tab:last-child { border-radius: 0 12px 12px 0; }
+
+        .schedule-tab:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .schedule-tab:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
         .schedule-tab.active {
-            background: linear-gradient(135deg, #ff6b81, #ff9a9e); color: white;
-            box-shadow: 0 4px 15px rgba(255,107,129,0.3);
+            background: linear-gradient(135deg, #ff6b81, #ff9a9e);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 129, 0.3);
         }
+
         .schedule-tab.inactive {
-            background-color: white; color: #999;
+            background-color: white;
+            color: #999;
             border: 1px solid #ffccd5;
         }
 
         .schedule-grid-wrapper {
-            background-color: white; border-radius: 20px; padding: 20px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.06); overflow-x: auto;
+            background-color: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.06);
+            overflow-x: auto;
         }
+
         .schedule-grid {
             display: grid;
             grid-template-columns: 55px repeat(7, 1fr);
-            gap: 3px; min-width: 600px;
+            gap: 3px;
+            min-width: 600px;
         }
+
         .grid-header {
-            background: linear-gradient(135deg, #ff6b81, #ff9a9e); color: white;
-            padding: 10px 4px; text-align: center; font-size: 13px; font-weight: bold;
-            border-radius: 8px; letter-spacing: 1px;
+            background: linear-gradient(135deg, #ff6b81, #ff9a9e);
+            color: white;
+            padding: 10px 4px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 8px;
+            letter-spacing: 1px;
         }
-        .grid-header.corner { background: transparent; }
+
+        .grid-header.corner {
+            background: transparent;
+        }
+
         .grid-time {
-            background-color: #fff5f7; color: #d88391; padding: 8px 4px;
-            text-align: center; font-size: 12px; font-weight: bold;
-            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            background-color: #fff5f7;
+            color: #d88391;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
         .grid-cell {
-            min-height: 48px; border-radius: 8px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            text-align: center; font-size: 11px; padding: 4px;
-            transition: all 0.2s; border: 1px solid #f9f0f2; word-break: break-all;
+            min-height: 48px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 11px;
+            padding: 4px;
+            transition: all 0.2s;
+            border: 1px solid #f9f0f2;
+            word-break: break-all;
         }
-        .grid-cell:hover { transform: scale(1.05); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+
+        .grid-cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
         .grid-cell.has-course {
-            color: white; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            border: none; line-height: 1.3;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            border: none;
+            line-height: 1.3;
         }
-        .grid-cell.empty { background-color: #fef8f9; }
-        .grid-cell.empty:hover { background-color: #ffecef; }
+
+        .grid-cell.empty {
+            background-color: #fef8f9;
+        }
+
+        .grid-cell.empty:hover {
+            background-color: #ffecef;
+        }
 
         /* 课表弹窗 */
         .course-modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
-            z-index: 1001; display: none; align-items: center; justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            z-index: 1001;
+            display: none;
+            align-items: center;
+            justify-content: center;
         }
+
         .course-modal {
-            background-color: white; padding: 30px; border-radius: 20px;
-            width: 90%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); text-align: center;
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            text-align: center;
         }
-        .course-modal h3 { color: #ff6b81; margin-top: 0; margin-bottom: 20px; }
+
+        .course-modal h3 {
+            color: #ff6b81;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
         .course-modal input {
-            width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ffccd5;
-            border-radius: 10px; box-sizing: border-box; font-family: inherit; font-size: 14px;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #ffccd5;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
         }
-        .course-modal input:focus { outline: none; border-color: #ff6b81; }
+
+        .course-modal input:focus {
+            outline: none;
+            border-color: #ff6b81;
+        }
+
         .color-picker-row {
-            display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
+
         .color-dot {
-            width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
-            border: 3px solid transparent; transition: all 0.2s;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
         }
-        .color-dot:hover { transform: scale(1.2); }
-        .color-dot.selected { border-color: #333; transform: scale(1.2); }
+
+        .color-dot:hover {
+            transform: scale(1.2);
+        }
+
+        .color-dot.selected {
+            border-color: #333;
+            transform: scale(1.2);
+        }
+
+        /* ======== 和好记录本区域 ======== */
+        .peace-section {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 70px;
+        }
+
+        .peace-section h3 {
+            font-size: 22px;
+            color: #74b9ff;
+            margin-bottom: 5px;
+            font-weight: normal;
+            letter-spacing: 4px;
+            text-align: center;
+        }
+
+        .peace-subtitle {
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        .peace-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .peace-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(116, 185, 255, 0.1);
+            border-left: 5px solid #74b9ff;
+            position: relative;
+            transition: transform 0.3s;
+            text-align: left;
+        }
+
+        .peace-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(116, 185, 255, 0.2);
+        }
+
+        .peace-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 10px;
+        }
+
+        .peace-date {
+            font-weight: bold;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .peace-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #e17055;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .peace-text {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .add-peace-btn {
+            background-color: white;
+            color: #74b9ff;
+            border: 2px dashed #74b9ff;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .add-peace-btn:hover {
+            background-color: #74b9ff;
+            color: white;
+        }
+
+        /* ======== 专属档案区域 ======== */
+        .profile-section {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 70px;
+        }
+
+        .profile-section h3 {
+            font-size: 22px;
+            color: #fd79a8;
+            margin-bottom: 5px;
+            font-weight: normal;
+            letter-spacing: 4px;
+            text-align: center;
+        }
+
+        .profile-subtitle {
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+
+        .profile-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(253, 121, 168, 0.1);
+        }
+
+        .profile-category {
+            margin-bottom: 25px;
+        }
+
+        .profile-category:last-of-type {
+            margin-bottom: 10px;
+        }
+
+        .category-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #a29bfe;
+            margin-bottom: 12px;
+            border-bottom: 2px dashed #f1f2f6;
+            padding-bottom: 6px;
+        }
+
+        .profile-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 14px;
+            color: #444;
+            line-height: 1.8;
+        }
+
+        .profile-list li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .profile-list .label {
+            color: #888;
+            min-width: 140px;
+            flex-shrink: 0;
+            text-align: left;
+        }
+
+        .profile-list .value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .edit-profile-btn {
+            background-color: white;
+            color: #fd79a8;
+            border: 2px dashed #fd79a8;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .edit-profile-btn:hover {
+            background-color: #fd79a8;
+            color: white;
+        }
     </style>
 </head>
+
 <body>
 
     <!-- 顶部小面板 (计时器) -->
@@ -232,19 +781,26 @@
     <div class="schedule-section">
         <h3>我们的课表 📚</h3>
         <div class="schedule-tabs">
-            <button class="schedule-tab active" id="tab-me" onclick="switchTab('me')">🧑 我的课表</button>
-            <button class="schedule-tab inactive" id="tab-ta" onclick="switchTab('ta')">👧 TA的课表</button>
+            <button class="schedule-tab active" id="tab-ta" onclick="switchTab('ta')">👧 LQ</button>
+            <button class="schedule-tab inactive" id="tab-me" onclick="switchTab('me')">🧑 Zz</button>
         </div>
-        
+
         <!-- === 周次控制器 === -->
-        <div class="week-controls" style="text-align: center; margin: 15px 0 10px 0; display: flex; align-items: center; justify-content: center; gap: 15px;">
-            <button onclick="changeWeek(-1)" style="border:none; background:none; cursor:pointer; color:#ff6b81; font-weight:bold; font-size:16px;">◀ 上周</button>
+        <div class="week-controls"
+            style="text-align: center; margin: 15px 0 10px 0; display: flex; align-items: center; justify-content: center; gap: 15px;">
+            <button onclick="changeWeek(-1)"
+                style="border:none; background:none; cursor:pointer; color:#ff6b81; font-weight:bold; font-size:16px;">◀
+                上周</button>
             <div>
                 <div id="week-display" style="font-weight: bold; font-size: 16px; color: #d88391;">本周</div>
-                <div id="week-dates-display" style="font-size: 11px; color: #999; margin-top: 3px;">2026-03-09 ~ 2026-03-15</div>
+                <div id="week-dates-display" style="font-size: 11px; color: #999; margin-top: 3px;">2026-03-09 ~
+                    2026-03-15</div>
             </div>
-            <button onclick="changeWeek(1)" style="border:none; background:none; cursor:pointer; color:#ff6b81; font-weight:bold; font-size:16px;">下周 ▶</button>
-            <button onclick="resetToThisWeek()" style="border:1px solid #ff6b81; background:white; color:#ff6b81; border-radius:12px; padding:3px 10px; font-size:12px; cursor:pointer; margin-left:10px;">回到本周</button>
+            <button onclick="changeWeek(1)"
+                style="border:none; background:none; cursor:pointer; color:#ff6b81; font-weight:bold; font-size:16px;">下周
+                ▶</button>
+            <button onclick="resetToThisWeek()"
+                style="border:1px solid #ff6b81; background:white; color:#ff6b81; border-radius:12px; padding:3px 10px; font-size:12px; cursor:pointer; margin-left:10px;">回到本周</button>
         </div>
         <div class="schedule-grid-wrapper">
             <div class="schedule-grid" id="schedule-grid">
@@ -253,10 +809,143 @@
         </div>
     </div>
 
+    <!-- ======== 和好记录本区域 ======== -->
+    <div class="peace-section">
+        <h3>我们的和好小本本 🤝</h3>
+        <p class="peace-subtitle">每一次争吵，都是为了更加了解彼此</p>
+        <div class="peace-list" id="peace-list">
+            <!-- JS自动生成 -->
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="add-peace-btn" onclick="openPeaceModal()">➕ 新增沟通与和好记录</button>
+        </div>
+    </div>
+
+    <!-- 和好记录弹窗 -->
+    <div id="peace-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h3 style="color: #74b9ff;">🕊️ 记录沟通与和好</h3>
+            <input type="text" id="peace-date" placeholder="日期 (例如: 2024.03.20)">
+            <textarea id="peace-reason" placeholder="起因：这次因为什么有了小情绪？" rows="2"></textarea>
+            <textarea id="peace-resolution" placeholder="解决：我们是怎么和好的？" rows="2"></textarea>
+            <textarea id="peace-reflection" placeholder="反思：以后怎么避免？想对TA说的话...(选填)" rows="2"></textarea>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closePeaceModal()">取消</button>
+                <button class="save-btn" onclick="savePeaceRecord()" style="background-color: #74b9ff;">记录下来</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== 专属档案区域 ======== -->
+    <div class="profile-section">
+        <h3 id="profile-main-title">关于 LQ · 专属档案 💖</h3>
+        <p class="profile-subtitle">属于你们的独家记忆与偏好</p>
+
+        <div class="schedule-tabs" style="margin-bottom: 20px;">
+            <button class="schedule-tab active" id="prof-tab-ta" onclick="switchProfTab('ta')">👧 LQ</button>
+            <button class="schedule-tab inactive" id="prof-tab-me" onclick="switchProfTab('me')">🧑 Zz</button>
+        </div>
+
+        <div class="profile-card">
+            <!-- 基础信息 -->
+            <div class="profile-category">
+                <div class="category-title">🔍 基础信息</div>
+                <ul class="profile-list">
+                    <li><span class="label">当前位置：</span><span class="value" id="prof-location">-</span></li>
+                    <li><span class="label">手机型号：</span><span class="value" id="prof-phone">-</span></li>
+                    <li><span class="label">生日：</span><span class="value" id="prof-birthday">-</span></li>
+                    <li><span class="label">身高：</span><span class="value" id="prof-height">-</span></li>
+                    <li><span class="label">鞋码：</span><span class="value" id="prof-shoeSize">-</span></li>
+                    <li><span class="label">星座：</span><span class="value" id="prof-zodiac">-</span></li>
+                    <li><span class="label">MBTI：</span><span class="value" id="prof-mbti">-</span></li>
+                </ul>
+            </div>
+
+            <!-- 饮食喜好 -->
+            <div class="profile-category">
+                <div class="category-title">🍜 饮食喜好</div>
+                <ul class="profile-list">
+                    <li><span class="label">喜欢的小零食：</span><span class="value" id="prof-snacks">-</span></li>
+                    <li><span class="label">喜欢的正餐/美食：</span><span class="value" id="prof-meals">-</span></li>
+                    <li><span class="label">喜欢的饮品：</span><span class="value" id="prof-drinks">-</span></li>
+                    <li><span class="label">水果偏好：</span><span class="value" id="prof-fruits">-</span></li>
+                </ul>
+            </div>
+
+            <!-- 日常与爱好 -->
+            <div class="profile-category">
+                <div class="category-title">🎮 日常与爱好</div>
+                <ul class="profile-list">
+                    <li><span class="label">喜欢的游戏：</span><span class="value" id="prof-games">-</span></li>
+                    <li><span class="label">无聊时喜欢：</span><span class="value" id="prof-freeTime">-</span></li>
+                    <li><span class="label">听歌软件：</span><span class="value" id="prof-musicApp">-</span></li>
+                    <li><span class="label">过敏情况：</span><span class="value" id="prof-allergies">-</span></li>
+                </ul>
+            </div>
+
+            <!-- 关系与承诺 -->
+            <div class="profile-category">
+                <div class="category-title">💌 关系与承诺</div>
+                <ul class="profile-list">
+                    <li><span class="label">最初在一起的时间：</span><span class="value" id="prof-anniversary">-</span></li>
+                    <li><span class="label">不可以做的事：</span><span class="value" id="prof-notToDo">-</span></li>
+                    <li><span class="label">对关系的期望：</span><span class="value" id="prof-expectation">-</span></li>
+                </ul>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="edit-profile-btn" onclick="openProfileModal()">✏️ 编辑专属档案</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 专属档案编辑弹窗 -->
+    <div id="profile-modal" class="modal-overlay">
+        <div class="modal-card" style="max-height: 85vh; overflow-y: auto;">
+            <h3 style="color: #fd79a8;" id="profile-modal-title">✏️ 编辑专属档案</h3>
+            <p style="font-size:12px; color:#999; margin-bottom:15px;">在下方更新细节吧~</p>
+
+            <!-- 基础信息区 -->
+            <div style="text-align:left; font-weight:bold; color:#a29bfe; margin-top:10px; margin-bottom: 5px;">🔍 基础信息</div>
+            <input type="text" id="edit-location" placeholder="位置 (如: 目前在太平村)">
+            <input type="text" id="edit-phone" placeholder="手机型号 (如: redmi)">
+            <input type="text" id="edit-birthday" placeholder="生日 (如: 2005 0927 农历0824)">
+            <input type="text" id="edit-height" placeholder="身高 (如: 169cm)">
+            <input type="text" id="edit-shoeSize" placeholder="鞋码 (如: 40)">
+            <input type="text" id="edit-zodiac" placeholder="星座 (如: 天秤座)">
+            <input type="text" id="edit-mbti" placeholder="MBTI (如: envp)">
+
+            <!-- 饮食喜好区 -->
+            <div style="text-align:left; font-weight:bold; color:#a29bfe; margin-top:10px; margin-bottom: 5px;">🍜 饮食喜好</div>
+            <input type="text" id="edit-snacks" placeholder="小零食 (麻辣素毛肚...)">
+            <input type="text" id="edit-meals" placeholder="正餐/美食 (半天妖...)">
+            <input type="text" id="edit-drinks" placeholder="饮品 (奶茶...)">
+            <textarea id="edit-fruits" placeholder="水果 (喜欢什么/不喜欢什么...)" rows="2"></textarea>
+
+            <!-- 日常与爱好区 -->
+            <div style="text-align:left; font-weight:bold; color:#a29bfe; margin-top:10px; margin-bottom: 5px;">🎮 日常与爱好</div>
+            <input type="text" id="edit-games" placeholder="喜欢的游戏 (王者荣耀...)">
+            <input type="text" id="edit-freeTime" placeholder="无聊时做的事 (刷抖音...)">
+            <input type="text" id="edit-musicApp" placeholder="听歌软件 (QQ音乐...)">
+            <input type="text" id="edit-allergies" placeholder="过敏情况 (对珊瑚过敏...)">
+
+            <!-- 关系与承诺区 -->
+            <div style="text-align:left; font-weight:bold; color:#a29bfe; margin-top:10px; margin-bottom: 5px;">💌 关系与承诺</div>
+            <input type="text" id="edit-anniversary" placeholder="最初在一起的时间 (20231017)">
+            <textarea id="edit-notToDo" placeholder="不可以做的事 (不凶老婆...)" rows="2"></textarea>
+            <textarea id="edit-expectation" placeholder="对关系的期望 (一直在一起...)" rows="2"></textarea>
+
+            <div class="modal-actions" style="margin-top: 15px;">
+                <button class="cancel-btn" onclick="closeProfileModal()">取消</button>
+                <button class="save-btn" onclick="savePartnerProfile()" style="background-color: #fd79a8;">保存档案</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 垂直时间轴 -->
     <div class="timeline-section">
         <h3>我们的回忆轨迹 🛤️</h3>
-        
+
         <!-- 我们将用 JS 从 Bmob 云端拉取节点塞进去 -->
         <div class="timeline-container" id="timeline-container">
             <!-- JS 自动生成 -->
@@ -287,13 +976,13 @@
             <h3>💌 写下新的回忆</h3>
             <input type="text" id="memory-date" placeholder="时间 (例如: 2024.02.14 跨年夜)">
             <textarea id="memory-text" placeholder="那一天的心情、发生的故事..." rows="3"></textarea>
-            
+
             <label class="file-btn">
                 🖼️ 点击选择照片 (可选)
                 <input type="file" id="memory-image" accept="image/*" onchange="previewFile()">
             </label>
             <span class="file-name-hint" id="file-name-hint">未选择照片</span>
-            
+
             <div class="modal-actions">
                 <button class="cancel-btn" onclick="closeModal()">取消</button>
                 <button class="save-btn" onclick="saveMemory()">封存回忆</button>
@@ -322,7 +1011,7 @@
         // 这是你给我的密码钥匙
         const APP_ID = "8e1e8e647e06b88bfde858650f8f3f44";
         const API_KEY = "63ff0bf3f93f38edca2bc938ec25bd3e";
-        
+
         // 告诉代码要把包裹送到 Bmob 上的哪个架子（表名：LoveMemory）
         const BMOB_URL = "https://api.bmobcloud.com/1/classes/LoveMemory";
 
@@ -332,7 +1021,7 @@
         function renderTimeline() {
             const container = document.getElementById('timeline-container');
             container.innerHTML = '<p style="text-align:center; color:#888;">正在飞速前往云端金库提取回忆...</p>';
-            
+
             // 使用浏览器的 Fetch 技术，带着钥匙去库里找东西（按创建时间排序）
             fetch(BMOB_URL + "?order=createdAt", {
                 method: 'GET',
@@ -342,30 +1031,30 @@
                     "Content-Type": "application/json"
                 }
             })
-            .then(res => res.json())
-            .then(data => {
-                const memoryArray = data.results || [];
-                container.innerHTML = ''; 
-                
-                if (memoryArray.length === 0) {
-                    container.innerHTML = '<p style="text-align:center; color:#888;">金库里空空如也，快去点击右下角添加你们的第一条回忆吧！</p>';
-                    return;
-                }
+                .then(res => res.json())
+                .then(data => {
+                    const memoryArray = data.results || [];
+                    container.innerHTML = '';
 
-                // 像排版一样，把拉取下来的资料一个个放进界面里
-                memoryArray.forEach((memory, index) => {
-                    const position = index % 2 === 0 ? 'left' : 'right';
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = `timeline-item ${position}`;
-                    
-                    const dataDate = memory.date;
-                    const dataText = memory.text;
-                    const dataImage = memory.image; 
-                    const objectId = memory.objectId; // 这是 Bmob 自动生成的身份证号
-                    
-                    let imageHtml = dataImage ? `<img src="${dataImage}" alt="照片">` : '';
-                    
-                    itemDiv.innerHTML = `
+                    if (memoryArray.length === 0) {
+                        container.innerHTML = '<p style="text-align:center; color:#888;">金库里空空如也，快去点击右下角添加你们的第一条回忆吧！</p>';
+                        return;
+                    }
+
+                    // 像排版一样，把拉取下来的资料一个个放进界面里
+                    memoryArray.forEach((memory, index) => {
+                        const position = index % 2 === 0 ? 'left' : 'right';
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = `timeline-item ${position}`;
+
+                        const dataDate = memory.date;
+                        const dataText = memory.text;
+                        const dataImage = memory.image;
+                        const objectId = memory.objectId; // 这是 Bmob 自动生成的身份证号
+
+                        let imageHtml = dataImage ? `<img src="${dataImage}" alt="照片">` : '';
+
+                        itemDiv.innerHTML = `
                         <div class="timeline-dot"></div>
                         <div class="timeline-date">${dataDate}</div>
                         <div class="timeline-content">
@@ -374,13 +1063,13 @@
                             <button class="delete-btn" onclick="deleteMemory('${objectId}')">删除这条</button>
                         </div>
                     `;
-                    container.appendChild(itemDiv);
+                        container.appendChild(itemDiv);
+                    });
+                })
+                .catch(err => {
+                    console.error("网络异常: ", err);
+                    container.innerHTML = '<p style="text-align:center; color:#ff6b81;">连接云端失败惹，检查一下网络或者密钥是否正确。</p>';
                 });
-            })
-            .catch(err => {
-                console.error("网络异常: ", err);
-                container.innerHTML = '<p style="text-align:center; color:#ff6b81;">连接云端失败惹，检查一下网络或者密钥是否正确。</p>';
-            });
         }
 
         // 打开填写表单弹窗
@@ -401,7 +1090,7 @@
                 // 如果照片太大可能会因为浏览器内存卡主，但在咱们这里没事
                 document.getElementById('file-name-hint').innerText = "已选择: " + file.name;
                 const reader = new FileReader();
-                reader.onload = function(e) { tempBase64Image = e.target.result; };
+                reader.onload = function (e) { tempBase64Image = e.target.result; };
                 reader.readAsDataURL(file);
             }
         }
@@ -431,19 +1120,19 @@
                 },
                 body: JSON.stringify(newMemory)
             })
-            .then(res => res.json())
-            .then(data => {
-                // 如果金库收到了，就会给我们返回一个 objectId
-                btn.innerText = "封存回忆";
-                btn.disabled = false;
-                closeModal();
-                renderTimeline(); // 保存成功后重新拉取整面墙
-            })
-            .catch(err => {
-                alert("云端拒收了这个包裹: " + err);
-                btn.innerText = "封存回忆";
-                btn.disabled = false;
-            });
+                .then(res => res.json())
+                .then(data => {
+                    // 如果金库收到了，就会给我们返回一个 objectId
+                    btn.innerText = "封存回忆";
+                    btn.disabled = false;
+                    closeModal();
+                    renderTimeline(); // 保存成功后重新拉取整面墙
+                })
+                .catch(err => {
+                    alert("云端拒收了这个包裹: " + err);
+                    btn.innerText = "封存回忆";
+                    btn.disabled = false;
+                });
         }
 
         // ======== 3. 命令云端销毁该记录 ========
@@ -456,12 +1145,12 @@
                         "X-Bmob-REST-API-Key": API_KEY
                     }
                 })
-                .then(res => {
-                    renderTimeline(); // 删除成功后刷新
-                })
-                .catch(err => {
-                    alert("删除失败惹: " + err);
-                });
+                    .then(res => {
+                        renderTimeline(); // 删除成功后刷新
+                    })
+                    .catch(err => {
+                        alert("删除失败惹: " + err);
+                    });
             }
         }
 
@@ -478,7 +1167,7 @@
         const DAYS = ['一', '二', '三', '四', '五', '六', '日'];
         const PERIODS = 12; // 一天最多 12 节课
 
-        let currentTab = 'me'; // 当前选中的 Tab
+        let currentTab = 'ta'; // 当前选中的 Tab
         let selectedColor = COURSE_COLORS[0]; // 默认颜色
         let pendingDay = null; // 即将添加课程的「星期几」
         let pendingPeriod = null; // 即将添加课程的「第几节」
@@ -499,7 +1188,7 @@
             const day = d.getDay();
             const diff = d.getDate() - day + (day === 0 ? -6 : 1); // 调整倒退到周一
             const monday = new Date(d.setDate(diff));
-            
+
             const weekDates = [];
             for (let i = 0; i < 7; i++) {
                 const temp = new Date(monday);
@@ -514,7 +1203,7 @@
             currentViewDate.setDate(currentViewDate.getDate() + offset * 7);
             renderScheduleGrid();
         }
-        
+
         // 回到本周
         function resetToThisWeek() {
             currentViewDate = new Date();
@@ -535,22 +1224,22 @@
             grid.innerHTML = '';
 
             const weekDates = getWeekDates(currentViewDate);
-            
+
             // 计算第几周 (开学第一周基准：我=3月9日，TA=3月2日)
             const startDateStr = currentTab === 'me' ? '2026-03-09' : '2026-03-02';
             const startDate = new Date(startDateStr);
             const currentMonday = new Date(weekDates[0]);
             const diffTime = currentMonday - startDate;
             const weekNumber = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7)) + 1;
-            
+
             document.getElementById('week-display').innerText = `第 ${weekNumber} 周`;
             document.getElementById('week-dates-display').innerText = `${weekDates[0]} ~ ${weekDates[6]}`;
 
             // 第一行：表头（角 + 周一~周日加上具体日期）
             grid.innerHTML += '<div class="grid-header corner"></div>';
-            DAYS.forEach((d, index) => { 
+            DAYS.forEach((d, index) => {
                 const dateNum = weekDates[index].substring(5); // 取 MM-DD
-                grid.innerHTML += `<div class="grid-header">周${d}<br><span style="font-size:9px;font-weight:normal">${dateNum}</span></div>`; 
+                grid.innerHTML += `<div class="grid-header">周${d}<br><span style="font-size:9px;font-weight:normal">${dateNum}</span></div>`;
             });
 
             // 逐行生成：第 1~12 节
@@ -591,15 +1280,15 @@
                     "Content-Type": "application/json"
                 }
             })
-            .then(res => res.json())
-            .then(data => {
-                courseCache = data.results || [];
-                renderScheduleGrid();
-            })
-            .catch(err => {
-                console.error('课表加载失败:', err);
-                renderScheduleGrid();
-            });
+                .then(res => res.json())
+                .then(data => {
+                    courseCache = data.results || [];
+                    renderScheduleGrid();
+                })
+                .catch(err => {
+                    console.error('课表加载失败:', err);
+                    renderScheduleGrid();
+                });
         }
 
         // 打开添加课程弹窗
@@ -658,18 +1347,18 @@
                 },
                 body: JSON.stringify(newCourse)
             })
-            .then(res => res.json())
-            .then(() => {
-                btn.innerText = '确认添加';
-                btn.disabled = false;
-                closeCourseModal();
-                loadSchedule();
-            })
-            .catch(err => {
-                alert('保存失败: ' + err);
-                btn.innerText = '确认添加';
-                btn.disabled = false;
-            });
+                .then(res => res.json())
+                .then(() => {
+                    btn.innerText = '确认添加';
+                    btn.disabled = false;
+                    closeCourseModal();
+                    loadSchedule();
+                })
+                .catch(err => {
+                    alert('保存失败: ' + err);
+                    btn.innerText = '确认添加';
+                    btn.disabled = false;
+                });
         }
 
         // 删除课程
@@ -682,16 +1371,236 @@
                         "X-Bmob-REST-API-Key": API_KEY
                     }
                 })
-                .then(() => loadSchedule())
-                .catch(err => alert('删除失败: ' + err));
+                    .then(() => loadSchedule())
+                    .catch(err => alert('删除失败: ' + err));
             }
         }
 
+        // =============================================
+        // ======= 和好小本本模块 =======
+        // =============================================
+        const PEACE_URL = "https://api.bmobcloud.com/1/classes/PeaceRecord";
+
+        function renderPeaceList() {
+            const container = document.getElementById('peace-list');
+            fetch(PEACE_URL + "?order=-createdAt", {
+                method: 'GET',
+                headers: {
+                    "X-Bmob-Application-Id": APP_ID,
+                    "X-Bmob-REST-API-Key": API_KEY,
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const records = data.results || [];
+                container.innerHTML = '';
+                if (records.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; color:#888; font-size:13px;">目前还没有记录哦，永远不吵架最好啦！</p>';
+                    return;
+                }
+                records.forEach(record => {
+                    const div = document.createElement('div');
+                    div.className = 'peace-card';
+                    div.innerHTML = `
+                        <div class="peace-header">
+                            <span class="peace-date">📅 ${record.date || '未知日期'}</span>
+                            <button class="delete-btn" onclick="deletePeace('${record.objectId}')" style="margin:0;">删除</button>
+                        </div>
+                        <div class="peace-title">⛈️ 为什么有了小情绪？</div>
+                        <div class="peace-text">${record.reason || ''}</div>
+                        <div class="peace-title">☀️ 我们是怎么和好的？</div>
+                        <div class="peace-text" style="background:#f0fbfe;">${record.resolution || ''}</div>
+                        ${record.reflection ? `<div class="peace-title">💡 反思与心声</div><div class="peace-text" style="background:#fff5f5;">${record.reflection}</div>` : ''}
+                    `;
+                    container.appendChild(div);
+                });
+            })
+            .catch(err => console.error("和好记录拉取失败", err));
+        }
+
+        function openPeaceModal() {
+            document.getElementById('peace-modal').style.display = 'flex';
+        }
+
+        function closePeaceModal() {
+            document.getElementById('peace-modal').style.display = 'none';
+            document.getElementById('peace-date').value = '';
+            document.getElementById('peace-reason').value = '';
+            document.getElementById('peace-resolution').value = '';
+            document.getElementById('peace-reflection').value = '';
+        }
+
+        function savePeaceRecord() {
+            const date = document.getElementById('peace-date').value.trim();
+            const reason = document.getElementById('peace-reason').value.trim();
+            const resolution = document.getElementById('peace-resolution').value.trim();
+            const reflection = document.getElementById('peace-reflection').value.trim();
+
+            if (!date || !reason || !resolution) {
+                alert("日期、起因和解决方式是必填的哦！");
+                return;
+            }
+
+            const btn = document.querySelector('#peace-modal .save-btn');
+            btn.innerText = "保存中...";
+            btn.disabled = true;
+
+            const newRecord = { date, reason, resolution, reflection };
+
+            fetch(PEACE_URL, {
+                method: 'POST',
+                headers: {
+                    "X-Bmob-Application-Id": APP_ID,
+                    "X-Bmob-REST-API-Key": API_KEY,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newRecord)
+            })
+            .then(res => res.json())
+            .then(() => {
+                btn.innerText = "记录下来";
+                btn.disabled = false;
+                closePeaceModal();
+                renderPeaceList();
+            })
+            .catch(err => {
+                alert("保存失败惹: " + err);
+                btn.innerText = "记录下来";
+                btn.disabled = false;
+            });
+        }
+
+        function deletePeace(objectId) {
+            if (confirm("确定要删除这条记录吗？")) {
+                fetch(PEACE_URL + "/" + objectId, {
+                    method: 'DELETE',
+                    headers: {
+                        "X-Bmob-Application-Id": APP_ID,
+                        "X-Bmob-REST-API-Key": API_KEY
+                    }
+                })
+                .then(() => renderPeaceList())
+                .catch(err => alert("删除失败: " + err));
+            }
+        }
+
+        // =============================================
+        // ======= 专属档案模块 =======
+        // =============================================
+        const PROFILE_URL = "https://api.bmobcloud.com/1/classes/PartnerProfile";
+        let currentProfTab = 'ta'; // 当前专属档案选中的 Tab
+        let profileCache = {}; // { 'ta': { objectId: ..., location: ... }, 'me': { ... } }
+        let currentProfileId = null; // 用于记录当前在云端的档案ID，为了更新时用
+
+        function switchProfTab(tab) {
+            currentProfTab = tab;
+            document.getElementById('prof-tab-ta').className = tab === 'ta' ? 'schedule-tab active' : 'schedule-tab inactive';
+            document.getElementById('prof-tab-me').className = tab === 'me' ? 'schedule-tab active' : 'schedule-tab inactive';
+            renderProfileData();
+        }
+
+        function renderProfileData() {
+            const fields = ['location', 'phone', 'birthday', 'height', 'shoeSize', 'zodiac', 'mbti', 'snacks', 'meals', 'drinks', 'fruits', 'games', 'freeTime', 'musicApp', 'allergies', 'anniversary', 'notToDo', 'expectation'];
+            const prof = profileCache[currentProfTab] || {};
+            currentProfileId = prof.objectId || null;
+
+            fields.forEach(f => {
+                const el = document.getElementById('prof-' + f);
+                if (el) el.innerText = prof[f] || '—';
+            });
+            
+            document.getElementById('profile-main-title').innerText = currentProfTab === 'ta' ? '关于 LQ · 专属档案 💖' : '关于 Zz · 专属档案 💖';
+        }
+
+        function loadPartnerProfile() {
+            fetch(PROFILE_URL + "?limit=10", {
+                method: 'GET',
+                headers: {
+                    "X-Bmob-Application-Id": APP_ID,
+                    "X-Bmob-REST-API-Key": API_KEY,
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const results = data.results || [];
+                profileCache = {};
+                results.forEach(p => {
+                    const owner = p.owner || 'ta'; // 旧数据如果没有 owner，默认为 ta
+                    profileCache[owner] = p;
+                });
+                renderProfileData();
+            })
+            .catch(err => console.error("读取档案失败: ", err));
+        }
+
+        function openProfileModal() {
+            const fields = ['location', 'phone', 'birthday', 'height', 'shoeSize', 'zodiac', 'mbti', 'snacks', 'meals', 'drinks', 'fruits', 'games', 'freeTime', 'musicApp', 'allergies', 'anniversary', 'notToDo', 'expectation'];
+            
+            fields.forEach(f => {
+                const displayEl = document.getElementById('prof-' + f);
+                const inputEl = document.getElementById('edit-' + f);
+                if (displayEl && inputEl) {
+                    inputEl.value = (displayEl.innerText === '—') ? '' : displayEl.innerText;
+                }
+            });
+            
+            document.getElementById('profile-modal-title').innerText = currentProfTab === 'ta' ? '✏️ 编辑 LQ 的档案' : '✏️ 编辑 Zz 的档案';
+            document.getElementById('profile-modal').style.display = 'flex';
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profile-modal').style.display = 'none';
+        }
+
+        function savePartnerProfile() {
+            const btn = document.querySelector('#profile-modal .save-btn');
+            btn.innerText = "正在保存...";
+            btn.disabled = true;
+
+            const fields = ['location', 'phone', 'birthday', 'height', 'shoeSize', 'zodiac', 'mbti', 'snacks', 'meals', 'drinks', 'fruits', 'games', 'freeTime', 'musicApp', 'allergies', 'anniversary', 'notToDo', 'expectation'];
+            const newProfileData = { owner: currentProfTab };
+
+            fields.forEach(f => {
+                const el = document.getElementById('edit-' + f);
+                if (el) newProfileData[f] = el.value.trim();
+            });
+
+            const method = currentProfileId ? 'PUT' : 'POST';
+            const url = currentProfileId ? (PROFILE_URL + '/' + currentProfileId) : PROFILE_URL;
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    "X-Bmob-Application-Id": APP_ID,
+                    "X-Bmob-REST-API-Key": API_KEY,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newProfileData)
+            })
+            .then(res => res.json())
+            .then(() => {
+                btn.innerText = "保存档案";
+                btn.disabled = false;
+                closeProfileModal();
+                loadPartnerProfile(); // 更新UI
+            })
+            .catch(err => {
+                alert("保存档案失败惹: " + err);
+                btn.innerText = "保存档案";
+                btn.disabled = false;
+            });
+        }
+
         // 网页刚打开时，自动去云端拉取内容
-        window.onload = function() {
+        window.onload = function () {
             renderTimeline();
             loadSchedule();
+            renderPeaceList();
+            loadPartnerProfile();
         };
     </script>
 </body>
+
 </html>
