@@ -769,7 +769,7 @@
 
         /* ======== 手机端响应式适配 (Media Queries) ======== */
         @media (max-width: 768px) {
-            body { padding: 30px 15px 80px 15px; }
+            body { padding: 30px 8px 80px 8px; }
 
             .timer-panel {
                 width: 100%;
@@ -804,42 +804,52 @@
                 color: #ff6b81;
             }
             
-            /* 课表适配：完整塞满整屏，不再横向滑动 */
+            /* 课表适配：完整塞满整屏，彻底杜绝所有横纵向溢出的可能 */
             .schedule-grid-wrapper {
-                padding: 10px 5px; /* 减少外边距腾出空间 */
+                padding: 8px 2px; 
+                width: 100%;
+                box-sizing: border-box;
+                overflow-x: hidden !important; /* 直接终结滚动条 */
             }
             .schedule-grid {
-                min-width: 100%; /* 取消固定宽度 */
-                grid-template-columns: 32px repeat(7, minmax(0, 1fr)); /* 关键修复：强制子元素不能超宽 */
-                gap: 1px; /* 进一步挤出空间 */
+                width: 100%;
+                min-width: 0 !important; /* 防止之前的600px死灰复燃 */
+                grid-template-columns: 24px repeat(7, minmax(0, 1fr)); /* 把时间那一列极限压缩到24px，右边格平分 */
+                gap: 1px; 
             }
             .grid-header {
-                font-size: 11px;
-                padding: 6px 0;
+                font-size: 10px;
+                padding: 4px 0;
+                letter-spacing: 0;
             }
             .grid-header span {
-                font-size: 8px !important;
+                font-size: 7px !important;
             }
             .grid-time {
-                font-size: 10px;
-                padding: 5px 0;
+                font-size: 9px;
+                padding: 3px 0;
+                letter-spacing: 0;
             }
             .grid-cell {
-                padding: 2px 1px;
-                min-height: 40px;
-                line-height: 1.1;
+                padding: 1px;
+                min-height: 38px;
+                line-height: 1.05;
                 font-size: 9px;
-                word-wrap: break-word; /* 强制换行 */
+                word-wrap: break-word; 
                 word-break: break-all;
+                overflow: hidden !important; 
             }
             .grid-cell span {
                 font-size: 9px !important;
+                letter-spacing: -0.5px; /* 把字间距缩一缩 */
             }
             .grid-cell br + span {
-                font-size: 8px !important;
+                font-size: 7px !important;
                 opacity: 0.8;
                 display: block;
                 margin-top: 1px;
+                transform: scale(0.9);
+                transform-origin: left top;
             }
 
             /* 按钮和弹窗微调 */
