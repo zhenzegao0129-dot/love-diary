@@ -1,8 +1,9 @@
-const CACHE_NAME = 'diary-cache-v2';
+const CACHE_NAME = 'diary-cache-v3';
 const urlsToCache = [
   './index.html',
   './icon-192.png',
   './icon-512.png',
+  './apple-touch-icon.png',
   './hezhao.jpg'
 ];
 
