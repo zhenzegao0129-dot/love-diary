@@ -1358,27 +1358,21 @@
 
             const weekDates = getWeekDates(currentViewDate);
             const isMobile = window.innerWidth < 768;
-            const showDays = 7; // 始终显示周一~周日
-
-            // 手机端用缩放让整个课表塞进屏幕
-            if (isMobile) {
-                const availableWidth = window.innerWidth - 20; // 减掉左右边距
-                const gridNaturalWidth = 520; // 课表的自然宽度
-                const scaleFactor = Math.min(1, availableWidth / gridNaturalWidth);
-                grid.style.transform = `scale(${scaleFactor})`;
-                grid.style.transformOrigin = 'top left';
-                grid.style.width = gridNaturalWidth + 'px';
-                // 调整父容器高度来适配缩放后的高度
-                grid.parentElement.style.height = (grid.scrollHeight * scaleFactor) + 'px';
-                grid.parentElement.style.overflow = 'hidden';
-            } else {
-                grid.style.transform = 'none';
-                grid.style.width = '100%';
-                grid.parentElement.style.height = 'auto';
-            }
+            const showDays = 7;
 
             // 动态设置网格列数
-            grid.style.gridTemplateColumns = (isMobile ? '30px' : '55px') + ` repeat(${showDays}, minmax(0, 1fr))`;
+            grid.style.gridTemplateColumns = '30px repeat(7, minmax(0, 1fr))';
+
+            // 手机端：给网格设定固定宽度，等渲染完再缩放
+            if (isMobile) {
+                grid.style.width = '520px';
+            } else {
+                grid.style.width = '100%';
+                grid.style.gridTemplateColumns = '55px repeat(7, 1fr)';
+                grid.style.transform = 'none';
+                grid.parentElement.style.height = 'auto';
+                grid.parentElement.style.overflow = '';
+            }
 
             // 计算第几周 (开学第一周基准：我=3月9日，TA=3月2日)
             const startDateStr = currentTab === 'me' ? '2026-03-09' : '2026-03-02';
@@ -1410,6 +1404,20 @@
                         grid.innerHTML += `<div class="grid-cell empty" onclick="openCourseModal(${d}, ${p})" title="点击添加课程"></div>`;
                     }
                 }
+            }
+
+            // 手机端：等内容渲染完毕后再缩放
+            if (isMobile) {
+                setTimeout(() => {
+                    const availableWidth = grid.parentElement.clientWidth;
+                    const gridRealWidth = 520;
+                    const scaleFactor = Math.min(1, availableWidth / gridRealWidth);
+                    grid.style.transform = `scale(${scaleFactor})`;
+                    grid.style.transformOrigin = 'top left';
+                    const realHeight = grid.scrollHeight;
+                    grid.parentElement.style.height = Math.ceil(realHeight * scaleFactor) + 'px';
+                    grid.parentElement.style.overflow = 'hidden';
+                }, 50);
             }
         }
 
